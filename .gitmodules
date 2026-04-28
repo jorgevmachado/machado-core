@@ -1,0 +1,6 @@
+[submodule "machado-web"]
+	path = machado-web
+	url = git@github.com:jorgevmachado/machado-web.git
+[submodule "machado-api"]
+	path = machado-api
+	url = git@github.com:jorgevmachado/machado-api.git
