@@ -81,68 +81,135 @@ Se possível, seja específico.
 
 ---
 
-## 6. Requisitos Técnicos
+## 6. Escopo Técnicos
 
-### Backend
+### 6.1 API
 
-- Criar/alterar endpoints (ex: `POST /battle/fight`)
-- Criar/alterar services
-- Criar/alterar repositories
-- Criar/alterar models
-- Criar/alterar schemas
+Toda regra de negócio deve estar na API.
+O frontend deve ser apenas consumidor.
 
----
+Funcionalidade
+- endpoints necessários
+- filtros, paginação, parâmetros
+Fluxos
 
-### Frontend
+Descrever cenários:
 
-- Criar/alterar páginas
-- Criar/alterar hooks
-- Criar/alterar componentes
-- Tratar estados:
-  - loading
-  - erro
-  - vazio
-  - sucesso
+1. inicial (ex: base vazia)
+2. intermediário
+3. ideal (com cache/dados completos)
+
+#### 6.1.1 Integrações externas (se houver)
+
+Endpoints de referência:
+
+{{external-endpoints}}
+
+Regras:
+
+- Usar endpoints para enriquecer o domínio
+- Priorizar dados completos e normalizados
+- Evitar chamadas redundantes
+
+#### 6.1.2 Enriquecimento de dados
+
+Durante o processamento, a API pode buscar e persistir:
+
+{{data-fields}}
+
+Regras:
+
+- Buscar apenas quando necessário
+- Persistir para evitar novas chamadas
+- Não falhar se algum campo não existir
+
+#### 6.1.3 Cache (se aplicável)
+
+Descrever:
+
+- objetivo
+- chaves
+- TTL
+
+Exemplo:
+
+{{cache-keys}}
+
+#### 6.1.4 Consistência e performance
+- Garantir idempotência
+- Evitar duplicação
+- Utilizar constraints únicas
+- Controlar paralelismo
+- Limitar chamadas externas
+- Aplicar fallback
+
+#### 6.1.5 Contrato da API
+
+A API deve:
+
+- retornar dados normalizados
+- evitar transformação no frontend
+- manter consistência de naming
+
+### 6.2 WEB
+#### 6.2.1 Páginas
+- páginas envolvidas
+- fluxo de navegação
+
+#### 6.2.2 Componentes
+- componentes principais
+- comportamento esperado
+- estados:
+- - loading
+- - erro
+- - vazio
+- - sucesso
+
+#### 6.2.3 Renderização
+
+Descrever como os dados devem aparecer:
+
+{{ui-snippet}}
+
+#### 6.2.4 Interações
+- ações do usuário
+- paginação
+- carregamento incremental
+- botões e eventos
 
 ---
 
 ## 7. Restrições Arquiteturais
-
-- Seguir o padrão existente de domínio (ex: `app/domain/...`)
 - Não criar nova arquitetura
-- Não alterar autenticação sem necessidade
-- Não duplicar lógica
-- Utilizar async/await
-- Utilizar ORM (SQLAlchemy)
-- Reutilizar estruturas existentes sempre que possível
+- Não duplicar lógica entre API e WEB
+- Toda regra de negócio deve estar na API
+- Reutilizar padrões existentes
+- Minimizar impacto no código atual
 
 ---
 
 ## 8. Critérios de Aceite
 
-- [ ] Critério objetivo 1
-- [ ] Critério objetivo 2
-- [ ] Critério objetivo 3
-- [ ] Nenhum fluxo existente foi quebrado
-- [ ] Testes foram criados ou ajustados
-
----
+- [ ] funcionalidade implementada
+- [ ] integração funcionando
+- [ ] dados persistidos corretamente
+- [ ] cache aplicado corretamente
+- [ ] sem duplicação de registros
+- [ ] frontend consumindo corretamente
+- [ ] UI consistente
+- [ ] sem regressões
 
 ## 9. Plano de Validação
 
-### Validação manual
+Validação manual
+1. Passo
+2. Passo
+3. Resultado esperado
 
-1. Passo 1  
-2. Passo 2  
-3. Resultado esperado  
-
----
-
-### Testes automatizados
-
-- Teste de cenário principal
-- Teste de erro
-- Teste de edge case
+Testes automatizados
+- cenário principal
+- erro
+- edge cases
 
 ---
 
@@ -155,8 +222,8 @@ Gerar uma proposta contendo:
 3. Solução proposta  
 4. Arquivos impactados  
 5. Plano de implementação  
-6. Alterações de modelo de dados (se houver)  
-7. Alterações de API (se houver)  
-8. Alterações de UI (se houver)  
+6. Alterações de modelo  
+7. Alterações de API  
+8. Alterações de UI  
 9. Estratégia de testes  
 10. Riscos e pontos de atenção
