@@ -231,6 +231,10 @@ Estados:
 - Não duplicar lógica
 - Reutilizar padrões existentes
 - Toda regra de negócio na API
+- Toda nova tabela criada no banco de dados deve suportar soft delete.
+- Não realizar exclusão física de registros, salvo se já existir padrão explícito no projeto.
+- Usar o padrão existente do projeto para soft delete, preferencialmente com `deleted_at`.
+- Consultas devem ignorar registros com soft delete ativo, salvo quando explicitamente necessário.
 ---
 
 ## 8. Critérios de aceite
@@ -243,4 +247,7 @@ Estados:
 - [ ] UI consistente
 - [ ] sem regressões
 - [ ] Cobertura de testes adequada ao padrão do projeto
-- [ ] Testes cobrindo fluxos principais e cenários críticos 
+- [ ] Testes cobrindo fluxos principais e cenários críticos
+- [ ] Novas tabelas possuem suporte a soft delete
+- [ ] Consultas padrão ignoram registros deletados logicamente
+- [ ] Nenhuma exclusão física foi implementada sem justificativa
