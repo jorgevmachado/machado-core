@@ -92,7 +92,7 @@ mach-api/
 - Herda `BaseSettings` do pydantic-settings
 - Lê `.env` e `.env.local` automaticamente
 - Campos obrigatórios: `SECRET_KEY`, `DATABASE_URL`, `ALGORITHM`, `REDIS_HOST`, `REDIS_PORT`, `ACCESS_TOKEN_EXPIRE_MINUTES`
-- Campos opcionais: `REDIS_URL`, `REDIS_CACHE_TTL_SECONDS` (default 3600), `POKEAPI_BASE_URL`
+- Campos opcionais: `REDIS_URL`, `REDIS_CACHE_TTL_SECONDS` (default 3600), `POKEAPI_BASE_URL`, `POKEAPI_VERIFY_SSL`, `POKEAPI_CA_BUNDLE`
 - **Nunca hardcode** valores; sempre via variável de ambiente
 
 ### `app/core/database/base.py`
@@ -117,6 +117,8 @@ mach-api/
 - `build_key(prefix, *parts)` → string de cache normalizada e determinística
 - `get_cache(key)` → `dict | None` (deserializa JSON do Redis)
 - `set_cache(key, value, ttl)` → serializa JSON e salva no Redis com TTL
+- `delete_cache(key)` → remove uma chave específica
+- `delete_pattern(pattern)` → remove chaves por padrão usando `scan_iter`
 
 ### `app/core/cache/service.py` — `CacheService`
 - Inicializado com `alias`, `prefix`, `logger_params`, `schema_class`
@@ -124,7 +126,9 @@ mach-api/
 - `build_key_one(param)` → chave para item único
 - `get_list(key)` / `set_list(key, data)` → cache de listas, listas paginadas e custom-paginadas
 - `get_one(key)` / `set_one(key, data)` → cache de item único
-- Deserializa usando `schema_class.model_validate()`
+- Aceita serializadores customizados para respostas que precisam de `serialize()`
+- `delete_domain()` → invalida todas as chaves do prefixo do domínio
+- Deserializa usando `schema_class.model_validate()` quando possível
 
 ### `app/core/repository/base.py` — `BaseRepository[ModelT]`
 - Atributos de classe: `model`, `relations` (tuple de `selectinload`), `default_order_by`
@@ -166,6 +170,20 @@ mach-api/
 - `FilterPage` → base de paginação/filtro: `page`, `offset`, `limit`, `order_by`
   - `FilterPage.build(page_filter, **extras)` → constrói dinamicamente com campos extras
   - `with_updates(**updates)` → cria cópia com novos valores
+
+### `app/infrastructure/external_api/pokeapi_client.py`
+- Client HTTP async para PokeAPI usando `httpx.AsyncClient`
+- Usa `Settings().POKEAPI_BASE_URL`, `POKEAPI_VERIFY_SSL` e `POKEAPI_CA_BUNDLE`
+- Métodos disponíveis:
+  - `list_pokemon(offset=0, limit=1350)`
+  - `get_pokemon(name_or_id)`
+  - `get_pokemon_species(name_or_id)`
+  - `get_pokemon_encounters(name_or_id)`
+  - `get_move(name_or_id)`
+  - `get_type(name_or_id)`
+  - `get_ability(name_or_id)`
+  - `get_growth_rate(name_or_id)`
+  - `get_evolution_chain_by_url(url)`
 
 ---
 
@@ -408,20 +426,64 @@ def is_effective(attacker_type: str, defender_types: list[str]) -> float:
 
 ---
 
+## CATÁLOGO POKEMON
+
+O catálogo Pokemon é a implementação atual da change OpenSpec `listagem-e-detalhe-pokemon`.
+
+### Rotas expostas
+
+Todas as rotas abaixo exigem `Depends(get_current_user)`.
+
+| Rota | Descrição |
+|---|---|
+| `GET /pokemon` | Lista Pokemon com paginação e filtros |
+| `GET /pokemon/{identifier}` | Detalhe por `id`, `name` ou `order`; enriquece registros `INCOMPLETE` |
+| `GET /pokemon/ability` | Lista habilidades sincronizadas |
+| `GET /pokemon/move` | Lista movimentos sincronizados |
+| `GET /pokemon/type` | Lista tipos sincronizados |
+| `GET /pokemon/habitat` | Lista habitats sincronizados |
+| `GET /pokemon/growth-rate` | Lista growth rates sincronizados |
+| `GET /pokemon/encounter` | Lista encontros sincronizados |
+
+### Fluxo de listagem
+
+- `PokemonService.list_all_cached()` monta chave `pokemon:list:{filters}:{pagination}`.
+- Se o catálogo local estiver vazio, `_ensure_initial_catalog()` chama apenas a listagem da PokeAPI com `offset=0&limit=1350`.
+- Cada item inicial persiste `name`, `order`, `external_image` e status `INCOMPLETE`.
+- A consulta local aplica filtros por `name`, `order`, `status` e `type`, sempre ignorando `deleted_at` por padrão.
+
+### Fluxo de detalhe
+
+- `PokemonRepository.find_detail(identifier)` aceita `order` numérico, UUID ou `name`.
+- Se o registro estiver `INCOMPLETE`, `PokemonService._enrich_if_needed()` busca dados externos e atualiza stats, species metadata, tipos, habilidades, movimentos, imagens, growth rate, habitat, shape, encounters e evoluções.
+- Interações entre subdomínios passam por services (`PokemonTypeService`, `PokemonMoveService`, etc.), mantendo repositories privados ao domínio dono.
+- Após enriquecimento, o status muda para `COMPLETE` e caches de lista/detalhe são invalidados.
+
+### Imagens
+
+- `PokemonImage` não aponta diretamente para `pokemon_id`; `Pokemon` referencia uma imagem principal via `images_id`.
+- `PokemonImage.images` guarda uma lista serializada em JSON com URLs tratadas.
+- `front_image`, `back_image`, `front_source` e `back_source` guardam as imagens selecionadas para apresentação.
+
+### Tipos
+
+- `PokemonType` guarda cores e URLs de badges da PokeAPI.
+- `weaknesses` e `strengths` são relações many-to-many autorreferenciais por `pokemon_type_weaknesses` e `pokemon_type_strengths`.
+
+---
+
 ## DOMÍNIOS EXISTENTES
 
 | Domínio | Prefixo | Descrição |
 |---|---|---|
 | `auth` | `/auth` | Registro, login, /me |
-| `trainer` | `/trainers` | Perfil do treinador |
-| `pokemon` | `/pokemon` | Catálogo de pokémons (PokeAPI) |
-| `pokedex` | `/pokedex` | Pokédex do treinador |
-| `my_pokemon` | `/my-pokemon` | Pokémons capturados |
-| `encounter` | `/battle` | Encontros com pokémons selvagens |
-| `battle` | `/battle` | Batalhas |
-| `battle_history` | `/battle/history` | Histórico de batalhas |
-| `dashboard` | `/dashboard` | Estatísticas gerais |
-| `pokemon_center` | `/pokemon-center` | Centro Pokémon (cura) |
+| `pokemon` | `/pokemon` | Catálogo local de Pokemon, sincronizado/enriquecido pela PokeAPI |
+| `pokemon/ability` | `/pokemon/ability` | Habilidades do catálogo |
+| `pokemon/move` | `/pokemon/move` | Movimentos do catálogo |
+| `pokemon/type` | `/pokemon/type` | Tipos, badges, forças e fraquezas |
+| `pokemon/habitat` | `/pokemon/habitat` | Habitats |
+| `pokemon/growth_rate` | `/pokemon/growth-rate` | Growth rates |
+| `pokemon/encounter` | `/pokemon/encounter` | Locais/métodos de encontro por Pokemon |
 
 ---
 
@@ -493,6 +555,8 @@ REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_CACHE_TTL_SECONDS=3600
 POKEAPI_BASE_URL=https://pokeapi.co/api/v2
+POKEAPI_VERIFY_SSL=false
+POKEAPI_CA_BUNDLE=
 ```
 
 ---
