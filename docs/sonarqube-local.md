@@ -42,6 +42,7 @@ make test
 ```
 
 Esse comando gera `machado-api/coverage.xml`, que e lido pelo Sonar.
+Em seguida, o fluxo local normaliza esse report para `machado-api/coverage-sonar.xml`, que e o arquivo consumido pelo scanner no monorepo.
 
 Web:
 
@@ -98,6 +99,18 @@ Use supressao somente quando houver justificativa tecnica clara. Prefira:
 - Limitar qualquer supressao ao menor trecho possivel.
 
 Nao use supressoes para esconder falhas corrigiveis de lint, tipo, teste ou seguranca.
+
+### Falsos positivos conhecidos neste repositorio
+
+No momento, o caso documentado e `machado-web/app/ds/autocomplete/Autocomplete.tsx` para as regras `typescript:S6819` e `typescript:S6842`.
+
+Justificativa tecnica:
+
+- O componente implementa explicitamente o padrao WAI-ARIA de `combobox` com `listbox` e `option`, com navegacao por teclado, destaque da opcao ativa e selecao incremental.
+- Trocar por `<select>` ou `<datalist>` removeria comportamento necessario do design system, como renderizacao customizada das opcoes, controle fino de highlight e integracao direta com o input existente.
+- Nesse contexto, o alerta do Sonar reflete uma heuristica generica contra roles ARIA em elementos customizados, nao um defeito real de acessibilidade no componente.
+
+Ao reexecutar a analise local, marque apenas essas ocorrencias como `falsepositive` e registre um comentario curto com a justificativa acima.
 
 ## Arquivos ignorados
 

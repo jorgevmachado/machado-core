@@ -34,10 +34,10 @@
 ## 5. SonarQube e Qualidade
 
 - [x] 5.1 Executar analise local do SonarQube/SonarScanner usando variaveis de ambiente para URL/token.
-- [ ] 5.2 Corrigir bugs, vulnerabilidades e code smells aplicaveis em codigo-fonte mantido da API.
-- [ ] 5.3 Corrigir bugs, vulnerabilidades e code smells aplicaveis em codigo-fonte mantido do Web.
-- [ ] 5.4 Documentar falsos positivos ou supressoes estritamente necessarias com justificativa tecnica.
-- [ ] 5.5 Reexecutar Sonar local e confirmar ausencia de issues aplicaveis no escopo analisado.
+- [x] 5.2 Corrigir bugs, vulnerabilidades e code smells aplicaveis em codigo-fonte mantido da API.
+- [x] 5.3 Corrigir bugs, vulnerabilidades e code smells aplicaveis em codigo-fonte mantido do Web.
+- [x] 5.4 Documentar falsos positivos ou supressoes estritamente necessarias com justificativa tecnica.
+- [x] 5.5 Reexecutar Sonar local e confirmar ausencia de issues aplicaveis no escopo analisado.
 
 ## 6. Validacao Final
 
