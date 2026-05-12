@@ -17,6 +17,14 @@ Não criar novos padrões se já existir um definido.
 ## 1. Objetivo
 
 Implementar a entidade `my-pokemon`, vinculada a um `trainer` e a um `pokemon`, permitindo que cada treinador possua Pokémon próprios com atributos, nickname, movimentos e progressão individual.
+Onde trainer deverá ter uma lista de `my-pokemon` no retorno da API.
+Implementar listagem e detalhamento de Pokémons do treinador.
+
+A feature deve permitir:
+
+- listar Pokémons de treinador com paginação e filtros;
+- visualizar detalhes de um Pokémon do treinador, incluindo atributos, movimentos e data de captura;
+- utilizar cache Redis para otimizar consultas.
 
 ---
 
@@ -38,6 +46,8 @@ Implementar a entidade `my-pokemon`, vinculada a um `trainer` e a um `pokemon`, 
 - A API deve selecionar 4 movimentos distintos do Pokémon base
 - Cada movimento deve possuir PP próprio
 - A estrutura deve ficar preparada para evolução, batalha, level up e futura troca de movimentos
+- O sistema deve listar Pokémons do treinador com paginação e filtros
+- O usuário deve conseguir visualizar detalhes completos de um Pokémon do treinador, incluindo atributos, movimentos e data de captura
 
 ---
 
@@ -54,6 +64,8 @@ Implementar a entidade `my-pokemon`, vinculada a um `trainer` e a um `pokemon`, 
 - Associação inicial de 4 movimentos distintos
 - Controle inicial de PP por movimento
 - Estrutura preparada para futura troca de movimentos no level up
+- Listagem paginada de Pokémon do treinador
+- Detalhamento completo de Pokémon do treinador
 
 ### Fora do escopo
 
@@ -130,7 +142,7 @@ Implementar a entidade `my-pokemon`, vinculada a um `trainer` e a um `pokemon`, 
 
 **Dado que:** os movimentos foram selecionados  
 **Quando:** forem associados ao `my-pokemon`  
-**Então:** cada movimento deve receber um PP aleatório entre 5 e 15
+**Então:** cada movimento deve receber um PP advindo do pp de `moves` de forma que tenha um controle separado. 
 
 ---
 
@@ -202,26 +214,23 @@ Durante o processamento, a API deve persistir:
 - created_at
 - updated_at
 - deleted_at
+- Logica para calculo dos atributos (HP, SPEED, ATTACK, DEFENSE, SPECIAL_ATTACK, SPECIAL_DEFENSE, EXPERIENCE, LEVEL) deve ser implementada na API, utilizando uma fórmula simples baseada no Pokémon base e um fator aleatório para garantir diversidade entre os `my-pokemon`.
+- moves (Com loǵica propria para escolher 4 movimentos distintos e com um PP próprio, para que a cada batalha que use o movimento diminua o PP e a cada visita ao centro pokemon restaura o PP)
 
 Para movimentos do `my-pokemon`, persistir:
 
-- my_pokemon_id
-- move_id
-- pp
-- created_at
-- updated_at
-- deleted_at
+- Pensei em guardar o pp que vem de `moves` e guardar um max_pp com o mesmo valor para conseguir tratar a restauração quando for a um centro pokémon.
 
 #### 6.1.3 Cache
 
-Não necessário neste momento.
+Usar o padrão do sistema, lembrando que para este caso o cache não precisa ser tão grande quanto a feature de Pokémon.
 
 #### 6.1.4 Consistência e performance
 
 - Garantir que cada `my-pokemon` pertença a um único `trainer`
 - Garantir que cada `my-pokemon` tenha apenas um `pokemon`
 - Garantir 4 movimentos distintos
-- Garantir PP mínimo 5 e máximo 15
+- Garantir PP e max_pp para cada movimento
 - Evitar duplicação de movimentos para o mesmo `my-pokemon`
 - Utilizar constraints únicas quando necessário
 - Evitar N+1 queries
@@ -311,7 +320,8 @@ Exibir:
 - [ ] `captured_at` registrado corretamente
 - [ ] atributos aleatórios gerados corretamente
 - [ ] 4 movimentos distintos atribuídos
-- [ ] PP gerado entre 5 e 15
+- [ ] PP gerado copiando o valor pp de `moves`
+- [ ] max_pp gerado copiando o valor pp de `moves`
 - [ ] movimentos persistidos separadamente
 - [ ] listagem funcionando
 - [ ] detalhe funcionando
