@@ -39,4 +39,4 @@
 - [x] 5.1 Add or update automated API tests for creation, ownership, move selection, PP persistence, soft delete behavior, cache behavior, and error scenarios
 - [x] 5.2 Add or update web tests for BFF handlers, list/detail/create flows, and shared UI states
 - [x] 5.3 Run `make lint`, relevant API tests, `yarn lint`, and relevant `machado-web` tests for the new feature
-- [ ] 5.4 Validate manually the main trainer roster flows, including create, list, detail, and protected access behavior
+- [x] 5.4 Validate manually the main trainer roster flows, including create, list, detail, and protected access behavior
