@@ -31,4 +31,4 @@
 - [x] 5.1 Add or update automated API tests for onboarding encounter initialization, encounter ownership and selection, walking outcomes, party constraints, Home payload, cache invalidation, and error scenarios
 - [x] 5.2 Add or update web tests for BFF handlers, Home rendering, encounter selection, walking event handling, and party management flows
 - [x] 5.3 Run `make lint`, relevant API tests, `yarn lint`, and relevant `machado-web` tests for the new feature
-- [ ] 5.4 Validate manually the main trainer exploration flows, including onboarding initialization, Home summary rendering, encounter selection, walking, and main-party updates
+- [x] 5.4 Validate manually the main trainer exploration flows, including onboarding initialization, Home summary rendering, encounter selection, walking, and main-party updates

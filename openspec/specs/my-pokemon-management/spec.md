@@ -1,7 +1,7 @@
 ## MODIFIED Requirements
 
 ### Requirement: MyPokemon API exposes normalized create, list, and detail flows
-The system SHALL expose authenticated API contracts for creating, listing, and detailing trainer-owned Pokémon with normalized payloads ready for frontend consumption.
+The system SHALL expose authenticated API contracts for creating, listing, detailing, and selecting trainer-owned Pokémon for the trainer's main party with normalized payloads ready for frontend consumption.
 
 #### Scenario: Authenticated user creates MyPokemon
 - **WHEN** an authenticated user submits a valid create request with a base Pokémon and optional nickname
@@ -9,7 +9,7 @@ The system SHALL expose authenticated API contracts for creating, listing, and d
 
 #### Scenario: Initial onboarding can create trainer and first MyPokemon together
 - **WHEN** an authenticated user without an existing `trainer` completes the initial starter selection flow
-- **THEN** the system MUST create the `trainer`, the first `my-pokemon`, and the initial `pokedex` collection as part of the same onboarding flow
+- **THEN** the system MUST create the `trainer`, the first `my-pokemon`, the initial `pokedex` collection, and the initial known encounter collection as part of the same onboarding flow
 
 #### Scenario: Onboarding is exposed by the trainer domain
 - **WHEN** the web or another client starts the initial trainer setup flow
@@ -29,7 +29,7 @@ The system SHALL expose authenticated API contracts for creating, listing, and d
 
 #### Scenario: Onboarding response returns the created trainer aggregate
 - **WHEN** onboarding succeeds
-- **THEN** the API MUST return the created trainer together with the initial `my-pokemons` and `pokedex` roster entries created in the same transaction
+- **THEN** the API MUST return the created trainer together with the initial `my-pokemons`, `pokedex`, and known encounter entries created in the same transaction
 
 #### Scenario: Authenticated user lists owned MyPokemon
 - **WHEN** an authenticated user requests the `my-pokemon` list
@@ -42,6 +42,10 @@ The system SHALL expose authenticated API contracts for creating, listing, and d
 #### Scenario: Authenticated user opens MyPokemon detail
 - **WHEN** an authenticated user requests one owned `my-pokemon` by `name`
 - **THEN** the API MUST return normalized detail data including trainer summary, base Pokémon summary, generated attributes, owned moves, PP state, and capture timestamp
+
+#### Scenario: Trainer can assign owned Pokemon to the main party
+- **WHEN** an authenticated trainer updates the main party selection
+- **THEN** the system MUST accept only trainer-owned active `my-pokemon` entries as party members
 
 #### Scenario: Unauthenticated access is rejected
 - **WHEN** a create, list, or detail request for `my-pokemon` arrives without valid authentication
