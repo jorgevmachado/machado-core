@@ -82,7 +82,7 @@ mach-web/
 │   │       ├── http/
 │   │       │   └── http.ts          # Classe Http abstrata: get, post, path, remove, send
 │   │       └── service/
-│   │           ├── service.ts       # BaseServiceAbstract extends Http (token → Authorization header)
+│   │           ├── service.py       # BaseServiceAbstract extends Http (token → Authorization header)
 │   │           └── types.ts         # IServiceConfig, IBaseResponse, IQueryParameters, IPaginate
 │   ├── ui/                          # Features de UI (por domínio)
 │   │   ├── index.ts
@@ -201,13 +201,13 @@ mach-web/
 - `ResponseError`: `{ error, message, statusCode }`
 - Usa `formatUrl(url, path, params)` de `@/app/utils` para montar a URL com query params
 
-### `app/shared/services/service/service.ts` — `BaseServiceAbstract`
+### `app/shared/services/service/service.py` — `BaseServiceAbstract`
 - Herda `Http`
 - Construtor recebe `baseUrl`, `pathUrl`, `token?`
 - Se `token` presente → injeta `Authorization: Bearer <token>` nos headers
 - Todas as features de serviço herdam esta classe
 
-### `app/ui/features/<feature>/service/service.ts` — Feature Service
+### `app/ui/features/<feature>/service/service.py` — Feature Service
 - Herda `BaseServiceAbstract`
 - Construtor: `super(baseUrl, '<pathUrl>', token?)`
 - Métodos tipados com os tipos definidos em `types.ts` da feature
@@ -295,7 +295,7 @@ export type UseMyEntityListResult = UsePaginatedListResult<TMyEntity, MyEntityFi
 - Tipos de resposta espelham os schemas Pydantic da mach-api
 - Separar tipos de entrada (params) dos tipos de saída (response)
 
-### 2. Service (`app/ui/features/<feature>/service/service.ts`)
+### 2. Service (`app/ui/features/<feature>/service/service.py`)
 
 ```typescript
 import { BaseServiceAbstract } from '@/app/shared/services/service/service';
