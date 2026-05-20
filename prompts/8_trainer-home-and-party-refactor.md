@@ -219,6 +219,19 @@ Utilizar apenas dados persistidos localmente.
 
 ---
 
+## Achados da implementação
+
+- `trainer_party` foi criado como domínio próprio em `machado-api/app/domain/trainer/trainer_party/`.
+- `TrainerService.get_home()` virou o agregador canônico de `GET /trainer/home`.
+- `TrainerExplorationService` ficou restrito a encounter/event/walk e agora expõe `get_active_encounter_by_trainer_id()`.
+- `list_latest_discoveries()` saiu de `trainer_exploration.repository` e passou para `pokedex.repository/service`.
+- `TrainerHomeSchema` foi mantido temporariamente em `trainer_exploration/schema.py` para evitar dependência circular durante a refatoração.
+- As rotas antigas `/trainer/exploration/home` e `/trainer/exploration/party` foram removidas em vez de mantidas como alias.
+- No web, o BFF permaneceu estável em `/api/trainer/home` e `/api/trainer/party`, enquanto o client backend agora chama `/trainer/home` e `/trainer/party`.
+- Não foi criado `useTrainerParty()` nesta fase; o consumo existente permaneceu suficiente para a migração.
+
+---
+
 #### 6.1.2 Enriquecimento de dados
 
 ### trainer_home

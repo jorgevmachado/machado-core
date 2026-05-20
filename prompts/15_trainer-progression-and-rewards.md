@@ -1,0 +1,1 @@
+# Proposta: trainer-progression-and-rewards
