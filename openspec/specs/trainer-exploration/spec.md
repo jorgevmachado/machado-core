@@ -47,7 +47,7 @@ The system SHALL allow authenticated trainers to walk in their active known enco
 
 #### Scenario: Walking can generate a wild Pokemon event
 - **WHEN** the random exploration outcome resolves to a wild encounter
-- **THEN** the API MUST select one persisted Pokémon available in the active encounter and return it in the event payload
+- **THEN** the API MUST select one persisted Pokémon available in the active encounter, MUST create or resume the trainer's active wild battle session, and MUST return the event payload with a normalized reference containing at least `battle_session_id`, `battle_status`, and `has_active_battle`
 
 #### Scenario: Walking can generate a Pokeball event
 - **WHEN** the random exploration outcome resolves to a Pokeball find
@@ -56,6 +56,10 @@ The system SHALL allow authenticated trainers to walk in their active known enco
 #### Scenario: Exploration event is persisted for future evolution
 - **WHEN** a walk action succeeds
 - **THEN** the system MUST persist an exploration event record containing the trainer context, event type, and normalized payload
+
+#### Scenario: Walking is blocked while battle is active
+- **WHEN** an authenticated trainer already has an active wild battle session and requests to walk again
+- **THEN** the API MUST prevent creation of a conflicting new exploration outcome and MUST preserve the existing active battle session
 
 ### Requirement: Trainer maintains a main party of up to six owned Pokemon
 The system SHALL allow authenticated trainers to manage a main party composed only of their owned `my-pokemon` entries, limited to six active slots.
