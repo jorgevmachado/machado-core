@@ -24,6 +24,8 @@
           <option value="tuple" />
           <option value="pathlib.PurePath" />
           <option value="uuid.UUID" />
+          <option value="app.models.pokemon_encounter.PokemonEncounter" />
+          <option value="app.models.trainer_encounter.TrainerEncounter" />
         </list>
       </option>
     </inspection_tool>
