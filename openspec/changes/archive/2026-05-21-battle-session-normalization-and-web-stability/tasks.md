@@ -1,19 +1,19 @@
 ## 1. Spec and Contract Alignment
 
-- [ ] 1.1 Normalize the proposal/design/spec artifacts so battle naming, final statuses, and active-session semantics are defined consistently.
-- [ ] 1.2 Decide and document the canonical behavior for “no active battle” across API, BFF, and frontend consumers.
-- [ ] 1.3 Document the final `/trainer/battle/*` endpoint contract and any temporary legacy compatibility that must exist during migration.
+- [x] 1.1 Normalize the proposal/design/spec artifacts so battle naming, final statuses, and active-session semantics are defined consistently.
+- [x] 1.2 Decide and document the canonical behavior for “no active battle” across API, BFF, and frontend consumers.
+- [x] 1.3 Document the final `/trainer/battle/*` endpoint contract and any temporary legacy compatibility that must exist during migration.
 
 ## 2. Backend Battle Domain Refactor
 
-- [ ] 2.1 Refactor the battle domain internals toward a neutral battle-session identity without breaking approved persistence history.
+- [x] 2.1 Refactor the battle domain internals toward a neutral battle-session identity without breaking approved persistence history.
 - [x] 2.2 Align backend enums, schemas, serializers, and service outputs with the canonical terminal statuses.
 - [x] 2.3 Implement the canonical active-session read behavior and add backend coverage for the “no active battle” case.
 
 ## 3. Home and Exploration Integration
 
 - [x] 3.1 Extend the trainer Home contract with a normalized active-battle summary for resume/reopen behavior.
-- [ ] 3.2 Update exploration walk responses and invalidation rules to keep Home and battle summary state synchronized.
+- [x] 3.2 Update exploration walk responses and invalidation rules to keep Home and battle summary state synchronized.
 - [x] 3.3 Add tests covering walk while battle is active, battle-summary presence in Home, and cache invalidation on battle lifecycle changes.
 
 ## 4. Web Modal Flow and Route Stability

@@ -24,7 +24,7 @@ The system SHALL provide authenticated endpoints for battle session retrieval an
 
 #### Scenario: Trainer reads active battle session
 - **WHEN** an authenticated trainer requests the active battle session
-- **THEN** the API MUST return the normalized active session for that trainer or one explicit canonical representation for the absence of an active session
+- **THEN** the API MUST return the normalized active session for that trainer or `404 Not Found` with an explicit "no active battle" detail as the canonical absence contract
 
 #### Scenario: Trainer lists battle logs
 - **WHEN** an authenticated trainer requests battle logs for an owned session
@@ -71,7 +71,7 @@ The system SHALL treat the absence of an active battle as a supported state rath
 
 #### Scenario: Reading active battle after battle ends does not break the UI
 - **WHEN** a trainer finishes a battle and a subsequent read of the active battle contract finds no active session
-- **THEN** the BFF and frontend MUST resolve that result into a stable empty or terminal-safe state without crashing the page
+- **THEN** the BFF and frontend MUST resolve that `404` result into a stable empty or terminal-safe state without crashing the page
 
 #### Scenario: Polling stops when battle is no longer active
 - **WHEN** the active battle flow transitions from active to absent or terminal

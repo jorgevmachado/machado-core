@@ -11,6 +11,7 @@ As propostas anteriores entregaram a primeira versão da batalha, mas deixaram i
 - Manter `/battle` disponível para uso futuro como página de informações/resumo de batalhas, sem depender dela como entrypoint automático do encounter.
 - Consolidar os endpoints de batalha sob namespace explícito `/trainer/battle/*` e documentar compatibilidade temporária se algum path legado ainda existir.
 - Estender o payload agregado da Home com resumo confiável de batalha ativa para retomada do fluxo sem heurísticas locais frágeis.
+- Fixar o comportamento canônico de "sem batalha ativa" como `404` na API, tratado como empty state suportado no BFF/frontend.
 - **BREAKING**: padronizar os estados finais canônicos da sessão e remover divergência entre nomes de enum/contrato atualmente usados.
 - **BREAKING**: renomear o domínio/capability interno de batalha para um nome neutro, com plano explícito de transição em código, specs e testes.
 
@@ -26,6 +27,7 @@ As propostas anteriores entregaram a primeira versão da batalha, mas deixaram i
 ## Impact
 
 - API: refactor do domínio de batalha, revisão de enums, schemas, serviços, rotas e eventuais aliases de compatibilidade.
+- Compatibilidade: nenhum endpoint HTTP legado fora de `/trainer/battle/*` permanece canônico; qualquer compatibilidade temporária deve existir apenas como shim interno de import durante a transição.
 - Web: ajustes no handoff de encounter, reuso do modal existente, revisão da tela protegida de batalha e atualização da Home com resumo de batalha ativa.
 - OpenSpec: atualização das specs existentes para refletir o contrato real desejado em vez da implementação atual.
 - Testes: revisão e ampliação de testes backend, BFF e frontend para ausência de batalha ativa, modal de encounter, estados terminais e resumo da Home.

@@ -39,7 +39,7 @@ Além disso, o `machado-web` já possui infraestrutura adequada de modal em `app
    - **Alternative considered:** simplificar em `WON`/`LOST`/`FLED`. Rejeitado porque isso perde contexto e já conflitou com a spec aprovada.
 
 4. **A leitura da sessão ativa deve ter um comportamento único e explícito para “nenhuma batalha ativa”**
-   - **Why:** o fluxo atual quebra porque a API/BFF/UI tratam esse caso de formas diferentes. A proposta permitirá duas implementações aceitáveis, mas exigirá uma só verdade no contrato final: ou resposta vazia normalizada, ou `404` tratado como empty state estável de ponta a ponta.
+   - **Why:** o fluxo atual quebra porque a API/BFF/UI tratam esse caso de formas diferentes. O contrato final fica fechado em `404` no endpoint de active battle, com tratamento de empty state estável no BFF/frontend.
    - **Alternative considered:** manter a ambiguidade atual e “tratar no client”. Rejeitado porque perpetua regressões.
 
 5. **Os endpoints públicos de batalha devem permanecer sob `/trainer/battle/*`**
@@ -65,7 +65,7 @@ Além disso, o `machado-web` já possui infraestrutura adequada de modal em `app
 1. **Sugestões para API**
    - Introduzir schema resumido de batalha ativa para a Home em vez de reutilizar o payload completo da sessão.
    - Concentrar a decisão de “sem batalha ativa” em um único service/BFF mapping reutilizável.
-   - Manter alias de compatibilidade apenas se algum consumidor real ainda depender de contrato legado.
+   - Manter compatibilidade apenas como shim interno de import se algum código ainda depender do package legado; não reintroduzir endpoints HTTP legados.
 
 2. **Sugestões para Web**
    - Encapsular a battle modal em feature própria, mas renderizada a partir da Home/exploration flow via `useModal`.
@@ -85,6 +85,22 @@ Além disso, o `machado-web` já possui infraestrutura adequada de modal em `app
 - **[Risk] Reservar `/battle` sem redefinir seu uso imediato parecer trabalho incompleto** → **Mitigation:** documentar claramente que a rota permanece válida, mas fora do handoff automático do encounter nesta mudança.
 - **[Risk] Escolha errada para “sem batalha ativa” continuar causando regressão** → **Mitigation:** exigir contrato único com cobertura de backend, BFF e frontend para esse caso.
 
+## Resolved Contract
+
+1. **No active battle**
+   - API: `GET /trainer/battle/active` retorna `404 Not Found` com detalhe explícito.
+   - BFF: propaga o `404` como resposta conhecida do domínio de batalha.
+   - Frontend: trata `404` como ausência suportada de batalha ativa, preservando snapshot terminal quando existir e interrompendo polling.
+   - Home: usa `active_battle: null` quando não há sessão ativa.
+
+2. **Battle endpoints**
+   - Endpoints canônicos: `GET /trainer/battle/active`, `GET /trainer/battle/logs`, `POST /trainer/battle/move`, `POST /trainer/battle/switch`, `POST /trainer/battle/flee`.
+   - `GET /trainer/battle/logs` pode retornar logs da sessão terminal mais recente quando a sessão ativa já terminou, permitindo refresh estável pós-batalha.
+
+3. **Legacy compatibility**
+   - Não existe path HTTP legado canônico fora de `/trainer/battle/*`.
+   - Compatibilidade temporária, quando necessária, fica restrita a aliases internos de import para evitar duplicação do domínio neutro de battle session.
+
 ## Migration Plan
 
 1. Atualizar proposal/specs para fixar o contrato desejado e impedir que a implementação atual continue sendo a referência semântica.
@@ -97,5 +113,4 @@ Além disso, o `machado-web` já possui infraestrutura adequada de modal em `app
 
 ## Open Questions
 
-- A ausência de batalha ativa ficará canonicamente como `404` tratado como empty state, ou como `200` com payload vazio normalizado?
-- O rename interno do domínio incluirá nomes de tabelas/modelos nesta mesma mudança ou ficará parcialmente compatibilizado nesta iteração?
+- O rename estrutural de models/tabelas históricas deve acontecer em uma mudança futura dedicada, já que esta iteração fecha o contrato e elimina a duplicação ativa do domínio sem reescrever persistência histórica.
